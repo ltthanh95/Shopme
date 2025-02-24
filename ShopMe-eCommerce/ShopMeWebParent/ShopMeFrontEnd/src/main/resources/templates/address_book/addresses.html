@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="fragments/page_structure :: page_header('Your address Book')"></th:block>
+<body>
+<div class="container"
+     th:with="redirectedFromCheckoutPage = ${param.redirect != null && param.redirect[0] == 'checkout'},
+     redirectedFromCartPage = ${param.redirect != null && param.redirect[0] == 'cart'}">
+
+    <th:block th:replace="fragments/navigation :: header_nav"></th:block>
+    <th:block th:replace="fragments/navigation :: search_nav"></th:block>
+
+    <div class="hero-title">
+        <h2 th:text="${redirectedFromCheckoutPage ? 'Choose a shipping address' : 'Your Address Book'}"></h2>
+        <h3 th:if="${redirectedFromCartPage}"><a th:href="@{${moduleURL} + '/new(redirect=cart)'}">Add New Address</a></h3>
+        <h3 th:if="${redirectedFromCheckoutPage}"><a th:href="@{${moduleURL} + '/new(redirect=checkout)'}">Add New Address</a></h3>
+        <h3 th:unless="${param.redirect}"><a th:href="@{${moduleURL} + '/new'}">Add New Address</a></h3>
+        <div th:if="${message != null}" class="alert alert-success text-center">
+            [[${message}]]
+        </div>
+        <div th:if="${exceptionMessage != null}" class="alert alert-danger text-center">
+            [[${exceptionMessage}]]
+        </div>
+    </div>
+    <div class="row m-1">
+        <div class="col-sm-6 mt-3">
+            <div class="card" th:classappend="${usePrimaryAddressAsDefault ? 'bg-warning' : ''}">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col-10">
+                            <b>Your primary address</b>
+                            <th:block th:if="${usePrimaryAddressAsDefault}">
+                                <a class="text-danger" th:text="${redirectedFromCheckoutPage ? '[Currently Selected]' : '[Default]'}" th:href="@{'#'}"></a>
+                            </th:block>
+                            <th:block th:unless="${usePrimaryAddressAsDefault}">
+                                <a class="text-success" th:if="${redirectedFromCartPage}"
+                                   th:href="@{${moduleURL} + '/default/primary?redirect=cart'}">
+                                    [Set as Default]
+                                </a>
+                                <a class="text-success" th:if="${redirectedFromCheckoutPage}"
+                                   th:href="@{${moduleURL} + '/default/primary?redirect=checkout'}">
+                                    [Choose]
+                                </a>
+                                <a class="text-success" th:unless="${param.redirect}"
+                                   th:href="@{${moduleURL} + '/default/primary'}">
+                                    [Set as Default]
+                                </a>
+                            </th:block>
+                        </div>
+                        <div class="col-2 text-end">
+                            <a th:if="${redirectedFromCartPage}" th:href="@{/account_details(redirect=cart)}" title="Edit address">
+                                <i class="fas fa-edit icon-lightblue"></i>
+                            </a>
+                            <a th:if="${redirectedFromCheckoutPage}" th:href="@{/account_details(redirect=checkout)}" title="Edit address">
+                                <i class="fas fa-edit icon-lightblue"></i>
+                            </a>
+                            <a th:unless="${param.redirect}" th:href="@{/account_details(redirect=address_book)}" title="Edit address">
+                                <i class="fas fa-edit icon-lightblue"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    [[${customer.address}]]
+                </div>
+            </div>
+        </div>
+
+        <th:block th:each="address, status : ${addresses}">
+            <div class="col-sm-6 mt-3">
+                <div class="card" th:classappend="${address.isDefaultForShipping() ? 'bg-warning' : ''}">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-10">
+                                <b>Address [[${status.count}]]</b>
+                                <th:block th:if="${address.defaultForShipping}">
+                                    <a class="text-danger" th:text="${redirectedFromCheckoutPage ? '[Currently Selected]' : '[Default]'}" th:href="@{'#'}"></a>
+                                </th:block>
+                                <th:block th:unless="${address.defaultForShipping}">
+                                    <a class="text-success" th:if="${redirectedFromCartPage}"
+                                       th:href="@{${moduleURL} + '/default/' + ${address.id} + '?redirect=cart'}">
+                                        [Set as Default]
+                                    </a>
+                                    <a class="text-success" th:if="${redirectedFromCheckoutPage}"
+                                       th:href="@{${moduleURL} + '/default/' + ${address.id} + '?redirect=checkout'}">
+                                        [Choose]
+                                    </a>
+                                    <a class="text-success" th:unless="${param.redirect}"
+                                       th:href="@{${moduleURL} + '/default/' + ${address.id}}">
+                                        [Set as Default]
+                                    </a>
+                                </th:block>
+                            </div>
+                            <div class="col-2 text-end">
+                                <a th:unless="${param.redirect}" th:href="@{${moduleURL} + '/edit/' +  ${address.id}}" title="Edit address">
+                                    <i class="fas fa-edit icon-lightblue"></i>
+                                </a>
+                                <a th:if="${redirectedFromCheckoutPage}" th:href="@{${moduleURL} + '/edit/' +  ${address.id} + '?redirect=checkout'}" title="Edit address">
+                                    <i class="fas fa-edit icon-lightblue"></i>
+                                </a>
+                                <a th:if="${redirectedFromCartPage}" th:href="@{${moduleURL} + '/edit/' +  ${address.id} + '?redirect=cart'}" title="Edit address">
+                                    <i class="fas fa-edit icon-lightblue"></i>
+                                </a>
+                                &nbsp;&nbsp;
+                                <a th:href="@{${moduleURL} + '/delete/' +  ${address.id}}"
+                                   th:entityId="${address.id}"
+                                   class="address-delete"
+                                   title="Delete this address"
+                                >
+                                    <i class="fas fa-trash icon-danger"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        [[${address}]]
+                    </div>
+                </div>
+            </div>
+        </th:block>
+        <div>&nbsp;</div>
+    </div>
+    <th:block th:replace="fragments/navigation :: footer_nav"></th:block>
+    <th:block th:replace="fragments/modal :: confirmDeleteModal"></th:block>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".address-delete").on("click", function (e) {
+            e.preventDefault();
+            let deleteUrl = $(e.currentTarget).attr("href");
+            let splitUrl = deleteUrl.split("/");
+            let id = splitUrl[splitUrl.length - 1];
+
+            $("#modalYesBtn").attr("href", deleteUrl);
+            showModalDialog("Delete Confirmation", "Are you sure to delete address <br> (ID: " + id + ")?");
+        });
+    });
+</script>
+<script type="text/javascript" th:src="@{/js/common_modal.js}"></script>
+</body>
+</html>

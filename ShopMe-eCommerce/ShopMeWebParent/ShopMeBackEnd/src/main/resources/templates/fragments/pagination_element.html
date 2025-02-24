@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<a class="page-link"
+   th:fragment="page_link(pageNum, pageLabel)"
+   th:href="@{${moduleURL} + '/page/' + ${pageNum} +
+   '?sortField=' + ${sortField} +
+   '&sortDir=' + ${sortDir} +
+   ${keyword != null ? '&keyword=' + keyword : '' } +
+   ${categoryId != null ? '&categoryId=' + categoryId : '' }}">[[${pageLabel}]]</a>
+</body>
+</html>

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="fragments/page_structure :: page_header(${pageTitle})"></th:block>
+<body>
+    <div class="container">
+        <th:block th:replace="fragments/navigation :: header_nav"></th:block>
+        <th:block th:replace="fragments/navigation :: search_nav"></th:block>
+        <th:block th:replace="fragments/breadcrumb :: content"></th:block>
+        <th:block th:if="${!category.children.empty}">
+            <div class="hero-title">
+                <h2>Sub Categories of [[${pageTitle}]]</h2>
+            </div>
+            <div class="row m-2 text-center">
+                <th:block th:each="cat : ${category.children}">
+                    <div class="col col-lg-2 col-md-3 col-sm-6 mb-4" th:if="${cat.enabled}">
+                        <a th:href="@{'/c/' + ${cat.alias}}">
+                            <img th:src="@{${cat.imagePath}}" height="100" />
+                            <br/>
+                            <b>[[${cat.name}]]</b>
+                        </a>
+                    </div>
+                </th:block>
+            </div>
+        </th:block>
+        <th:block th:if="${!products.empty}">
+            <div>
+                <h2>Products in [[${pageTitle}]]</h2>
+            </div>
+            <div class="row m-4">
+                <th:block th:each="product : ${products}">
+                    <th:block th:replace="fragments/product_fragment :: price_for_list"></th:block>
+                </th:block>
+            </div>
+        </th:block>
+        <div class="text-center m-1" th:if="${total > 0}">
+            <span>Showing Products # [[${startNo}]] to [[${endNo}]] of [[${total}]]</span>
+            <th:block th:replace="fragments/pagination::pagination_fragment('c/' + ${alias})"></th:block>
+        </div>
+        <div class="text-center m-1" th:unless="${total > 0}">
+            <h2>No Products found</h2>
+        </div>
+        <th:block th:replace="fragments/navigation :: footer_nav"></th:block>
+    </div>
+</body>
+</html>

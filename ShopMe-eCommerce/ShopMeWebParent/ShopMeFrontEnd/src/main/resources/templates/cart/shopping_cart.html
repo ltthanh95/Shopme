@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<th:block th:replace="fragments/page_structure :: page_header('Shopping cart')"></th:block>
+<body>
+<div class="container">
+   <th:block th:replace="fragments/navigation :: header_nav"></th:block>
+   <th:block th:replace="fragments/navigation :: search_nav"></th:block>
+   <div class="hero-title">
+      <h2>Shopping Cart</h2>
+      <div th:if="${message != null}" class="alert alert-success text-center">
+         [[${message}]]
+      </div>
+      <div th:if="${exceptionMessage != null}" class="alert alert-danger text-center">
+         [[${exceptionMessage}]]
+      </div>
+   </div>
+   <div class="row m-1">
+      <div class="col-sm-1"></div>
+      <div class="col-sm-7">
+         <th:block th:each="item, status : ${cartItems}">
+            <div class="row border rounded p-1" th:with="product = ${item.product}" th:id="'row' + ${status.count}">
+               <div class="col-1 col-md-1 col-lg-1">
+                  <div class="divCount">[[${status.count}]]</div>
+                  <div>
+                     <a class="link-remove" th:href="@{'/cart/remove/' + ${product.id}}" th:rowNumber="${status.count}">
+                        <i class="fa fa-trash icon-dark" aria-hidden="true"></i>
+                     </a>
+                  </div>
+               </div>
+               <div class="col-6 col-md-4 col-lg-3">
+                  <img th:src="@{${item.product.mainImagePath}}" class="img-fluid"/>
+               </div>
+               <div class="col-10 col-md-7 col-lg-8">
+                  <div>
+                     <a th:href="@{'/p/' + ${item.product.alias}}" target="_blank" th:title="${product.name}">
+                        <b>[[${item.product.shortName}]]</b>
+                     </a>
+                  </div>
+                  <th:block th:replace="cart/quantity_control::content(${item.quantity}, ${product.id})"></th:block>
+                  <div>
+                     <span>X&nbsp;</span>
+                     <th:block th:replace="fragments/product_fragment :: simple_product_price('tag')"></th:block>
+                  </div>
+                  <div th:id="'subtotal-' + ${product.id}" class="subtotal" th:data-number="${item.subTotal}">
+                     <span>=&nbsp;</span>
+                     <th:block th:replace="fragments/product_fragment :: simple_price(${item.subTotal})"></th:block>
+                  </div>
+               </div>
+            </div>
+            <div class="row m-1" th:id="'blankline' + ${status.count}">&nbsp;</div>
+         </th:block>
+      </div>
+      <div class="col-sm-1"></div>
+      <div class="col-sm-3" th:unless="${#lists.isEmpty(cartItems)}" id="sectionTotal">
+         <div>
+            <span class="h3">Estimated Total:</span>
+         </div>
+         <div class="mt-2" id="estimatedTotal" th:data-number="${estimatedTotal}">
+            <th:block th:replace="fragments/product_fragment :: simple_price(${estimatedTotal})"></th:block>
+         </div>
+         <div class="mt-2">
+            <th:block th:if="${shippingSupported}">
+               <form th:action="@{/checkout}">
+                  <button type="submit" class="btn btn-danger p-3 mt-2">Check Out</button>
+               </form>
+            </th:block>
+            <th:block th:unless="${shippingSupported}">
+               <div>
+                  <span class="h5 text-warning">No shipping available for your location</span>
+                  <div th:if="${usePrimaryAddressAsDefault}">
+                     <a class="h6" th:href="@{/account_details(redirect=cart)}">Update your address</a>
+                  </div>
+                  <div th:unless="${usePrimaryAddressAsDefault}">
+                     <a class="h6" th:href="@{/address_book(redirect=cart)}">Use another shipping address</a>
+                  </div>
+               </div>
+            </th:block>
+         </div>
+      </div>
+   </div>
+   <div th:class="'text-center ' + ${#lists.isEmpty(cartItems) ? '' : 'd-none'}" id="emptyCartMsg">
+      <h3>You have not chosen any products yet.</h3>
+   </div>
+   <th:block th:replace="fragments/navigation :: footer_nav"></th:block>
+   <th:block th:replace="fragments/modal :: shopmeModal"></th:block>
+</div>
+<script type="text/javascript">
+   const contextPath = "[[@{/}]]";
+   const csrfHeaderName = "[[${_csrf.headerName}]]";
+   const csrfHeaderValue = "[[${_csrf.token}]]";
+   const decimalDigits = [[${DECIMAL_DIGITS}]];
+   const decimalPointType = "[[${DECIMAL_POINT_TYPE}]]";
+   const thousandsPointType = "[[${THOUSANDS_POINT_TYPE}]]";
+</script>
+<script type="text/javascript" th:src="@{/library/jquery.number.min.js}"></script>
+<script type="text/javascript" th:src="@{/js/common_modal.js}"></script>
+<script type="text/javascript" th:src="@{/js/shopping_cart/shopping_cart.js}"></script>
+</body>
+</html>

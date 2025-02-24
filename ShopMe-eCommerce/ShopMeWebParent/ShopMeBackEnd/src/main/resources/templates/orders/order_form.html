@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/page_structure :: page_header_with_richtext(${pageTitle})"></head>
+<body>
+<div class="container-fluid">
+	<div th:replace="fragments/navigation :: page_nav"></div>
+	<div class="text-center">
+		<h2>Manage Order | [[${pageTitle}]]</h2>
+	</div>
+	<div class="container">
+		<div class="border border-secondary rounded p-3">
+			<form th:action="@{/orders/save}" method="post" th:object="${order}" onsubmit="return processFormBeforeSubmit();">
+				<div>
+					<ul class="nav nav-tabs" id="orderDetailTab" role="tablist">
+						<li class="nav-item" role="presentation">
+							<button class="nav-link active" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
+						</li>
+						<li class="nav-item" role="presentation">
+							<button class="nav-link" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab">Products</button>
+						</li>
+						<li class="nav-item" role="presentation">
+							<button class="nav-link" data-bs-toggle="tab" data-bs-target="#shipping" type="button" role="tab">Shipping</button>
+						</li>
+						<li class="nav-item" role="presentation">
+							<button class="nav-link" data-bs-toggle="tab" data-bs-target="#track" type="button" role="tab">Track</button>
+						</li>
+					</ul>
+					<div class="tab-content" id="orderDetailContent">
+						<div class="tab-pane fade show active p-3" id="overview" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
+							<th:block th:replace="orders/order_form_overview :: content"></th:block>
+						</div>
+						<div class="tab-pane fade p-3" id="products" role="tabpanel" aria-labelledby="products-tab" tabindex="1">
+							<th:block th:replace="orders/order_form_products :: content"></th:block>
+						</div>
+						<div class="tab-pane fade p-3" id="shipping" role="tabpanel" aria-labelledby="shipping-tab" tabindex="2">
+							<th:block th:replace="orders/order_form_shipping :: content"></th:block>
+						</div>
+						<div class="tab-pane fade p-3" id="track" role="tabpanel" aria-labelledby="track-tab" tabindex="3">
+							<th:block th:replace="orders/order_form_track :: content"></th:block>
+						</div>
+					</div>
+				</div>
+				<div class="text-center">
+					<input type="submit" value="Save" class="btn btn-primary m-3"/>
+					<input type="button" value="Cancel" class="btn btn-secondary" id="cancelForm"/>
+				</div>
+			</form>
+		</div>
+	</div>
+	<div th:replace="fragments/modal::shopmeModal"></div>
+	<div th:replace="orders/add_product_modal :: content"></div>
+	<div th:replace="fragments/page_structure :: page_footer"></div>
+</div>
+<script type="text/javascript">
+	const contextPath = "[[@{/}]]";
+	const moduleURL = "[[@{/orders}]]";
+	const csrfHeaderName = "[[${_csrf.headerName}]]";
+	const csrfHeaderValue = "[[${_csrf.token}]]";
+</script>
+<script th:src="@{/js/common_form.js}"></script>
+<script th:src="@{/js/shipping/shipping_form.js}"></script>
+<script th:src="@{/library/jquery.number.min.js}"></script>
+<script th:src="@{/js/order/overview_products.js}"></script>
+<script th:src="@{/js/order/add_products.js}"></script>
+<script th:src="@{/js/order/remove_products.js}"></script>
+<script th:src="@{/js/order/add_track.js}"></script>
+<script th:src="@{/js/order/remove_track.js}"></script>
+</body>
+</html>
